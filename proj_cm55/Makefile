@@ -7,7 +7,7 @@
 #
 ################################################################################
 # \copyright
-# Copyright 2024-2025, Cypress Semiconductor Corporation (an Infineon company)
+# (c) 2024-2025, Infineon Technologies AG, or an affiliate of Infineon Technologies AG.
 # SPDX-License-Identifier: Apache-2.0
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -54,13 +54,16 @@ VERBOSE=
 # ... then code in directories named COMPONENT_foo and COMPONENT_bar will be
 # added to the build
 #
-COMPONENTS+=FREERTOS RTOS_AWARE  
+COMPONENTS+=
 
 # Like COMPONENTS, but disable optional code that was enabled by default.
 DISABLE_COMPONENTS=
 
 CORE=CM55
 CORE_NAME=CM55_0
+
+#Configure this application to be loaded into flash/ram
+APPTYPE=flash
 
 # By default the build system automatically looks in the Makefile's directory
 # tree for source code and builds it. The SOURCES variable can be used to
@@ -73,10 +76,10 @@ SOURCES+=
 INCLUDES+=
 
 # Add additional defines to the build process (without a leading -D).
-DEFINES+=CY_RETARGET_IO_CONVERT_LF_TO_CRLF
+DEFINES+=
 
 # Select softfp or hardfp floating point. Default is softfp.
-VFP_SELECT+=
+VFP_SELECT=
 
 # Additional / custom C compiler flags.
 #
@@ -106,11 +109,7 @@ LDLIBS+=
 LINKER_SCRIPT=
 
 # Custom pre-build commands to run.
-PREBUILD=
-
-# Custom post-build commands to run.
-POSTBUILD=
-
+PREBUILD+=
 
 ################################################################################
 # Paths
@@ -123,11 +122,11 @@ CY_APP_PATH=
 
 # Relative path to the shared repo location.
 #
-# All .mtb files have the format, <URI>#<COMMIT>#<LOCATION>. If the <LOCATION> 
-# field begins with $$ASSET_REPO$$, then the repo is deposited in the path 
-# specified by the CY_GETLIBS_SHARED_PATH variable. The default location is one 
-# directory level above the current app directory. This is used with 
-# CY_GETLIBS_SHARED_NAME variable, which specifies the directory name.
+# All .mtb files have the format, <URI>#<COMMIT>#<LOCATION>. If the <LOCATION> field 
+# begins with $$ASSET_REPO$$, then the repo is deposited in the path specified by 
+# the CY_GETLIBS_SHARED_PATH variable. The default location is one directory level 
+# above the current app directory.
+# This is used with CY_GETLIBS_SHARED_NAME variable, which specifies the directory name.
 CY_GETLIBS_SHARED_PATH=../..
 
 # Directory name of the shared repo location.

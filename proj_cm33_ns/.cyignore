@@ -1,1 +1,2 @@
 $(SEARCH_aws-iot-device-sdk-embedded-C)/libraries/standard/coreHTTP
+$(SEARCH_aws-iot-device-sdk-embedded-C)/source/ota

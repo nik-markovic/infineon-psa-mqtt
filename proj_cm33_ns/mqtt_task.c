@@ -59,7 +59,7 @@
 #include "mqtt_client_config.h"
 
 /* Middleware libraries */
-#include "cy_retarget_io.h"
+// #include "cy_retarget_io.h"
 #include "cy_wcm.h"
 
 #include "cy_mqtt_api.h"

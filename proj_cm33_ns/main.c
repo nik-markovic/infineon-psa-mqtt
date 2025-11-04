@@ -48,6 +48,11 @@
 #include "cyabs_rtos_impl.h"
 #include "cy_time.h"
 #include "cycfg_peripherals.h"
+
+// for TFM
+#include "tfm_ns_interface.h"
+#include "os_wrapper/common.h"
+
 /******************************************************************************
  * Macros
  ******************************************************************************/
@@ -225,7 +230,17 @@ int main(void)
     setup_tickless_idle_timer();
 
     /* Initialize retarget-io middleware */
+#if 0 // cannot use retarget io - remove from deps
     init_retarget_io();
+#endif
+
+    /* Initialize TF-M interface */
+    result = tfm_ns_interface_init();
+
+    if(result != OS_WRAPPER_SUCCESS)
+    {
+        CY_ASSERT(0);
+    }
 
     /* Setup CLIB support library. */
     setup_clib_support();
@@ -243,10 +258,16 @@ int main(void)
 
     /* Enable global interrupts. */
     __enable_irq();
-
+    
+    extern void psa_test_task(void *pvParameters);
+    result = xTaskCreate(psa_test_task, "PSA Test", (1024 * 2),
+                NULL, MQTT_CLIENT_TASK_PRIORITY, NULL);
+    
     /* Create the MQTT Client task. */
+    #if 0
     result = xTaskCreate(mqtt_client_task, "MQTT Client task", MQTT_CLIENT_TASK_STACK_SIZE,
                 NULL, MQTT_CLIENT_TASK_PRIORITY, NULL);
+    #endif
 
     if( pdPASS == result )
     {

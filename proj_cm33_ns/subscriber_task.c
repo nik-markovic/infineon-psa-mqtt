@@ -54,7 +54,7 @@
 
 /* Middleware libraries */
 #include "cy_mqtt_api.h"
-#include "cy_retarget_io.h"
+// #include "cy_retarget_io.h"
 
 /******************************************************************************
 * Macros

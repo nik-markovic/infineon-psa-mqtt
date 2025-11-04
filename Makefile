@@ -7,7 +7,7 @@
 #
 ################################################################################
 # \copyright
-# Copyright 2024-2025, Cypress Semiconductor Corporation (an Infineon company)
+# (c) 2024-2025, Infineon Technologies AG, or an affiliate of Infineon Technologies AG.
 # SPDX-License-Identifier: Apache-2.0
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,19 +23,20 @@
 # limitations under the License.
 ################################################################################
 
+
 ################################################################################
 # Basic Configuration
 ################################################################################
 
 # Type of ModusToolbox Makefile Options include:
 #
-# COMBINED    -- Top Level Makefile usually for single standalone application
-# APPLICATION -- Top Level Makefile usually for multi project application
-# PROJECT     -- Project Makefile under Application
+#COMBINED    -- Top Level Makefile usually for single standalone application
+#APPLICATION -- Top Level Makefile usually for multi project application
+#PROJECT     -- Project Makefile under Application
 #
 MTB_TYPE=APPLICATION
 
-MTB_PROJECTS=proj_cm33_s proj_cm33_ns proj_cm55
+MTB_PROJECTS=proj_cm33_s proj_cm33_ns proj_cm55 proj_bootloader
 
 ################################################################################
 # Paths

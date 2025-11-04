@@ -108,6 +108,7 @@ static cy_stc_syspm_callback_t retarget_io_syspm_cb =
 *******************************************************************************/
 void init_retarget_io(void)
 {
+    #if 0
     cy_rslt_t result = CY_RSLT_SUCCESS;
 
     /* Initialize the SCB UART */
@@ -147,6 +148,7 @@ void init_retarget_io(void)
     /* UART SysPm callback registration for retarget-io */
     Cy_SysPm_RegisterCallback(&retarget_io_syspm_cb);
 #endif /* (CY_CFG_PWR_SYS_IDLE_MODE == CY_CFG_PWR_MODE_DEEPSLEEP) */
+    #endif
 }
 
 /* [] END OF FILE */
