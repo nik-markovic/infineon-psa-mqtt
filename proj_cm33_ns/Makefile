@@ -75,8 +75,9 @@ SOURCES=
 INCLUDES=
 
 # Custom configuration of mbedtls library.
-# This will be picked up from wifi-core-freertos-lwip-mbedtls/configs
-MBEDTLSFLAGS = MBEDTLS_USER_CONFIG_FILE='"configs/mbedtls_user_config.h"'
+# This file will override what we picked up from wifi-core-freertos-lwip-mbedtls/configs
+# @see: proj_cm33_ns/mbedtls_user_overlay.h
+MBEDTLSFLAGS = MBEDTLS_USER_CONFIG_FILE='"mbedtls_user_overlay.h"'
 
 # Add additional defines to the build process (without a leading -D).
 DEFINES+=$(MBEDTLSFLAGS) CYBSP_WIFI_CAPABLE CY_RETARGET_IO_CONVERT_LF_TO_CRLF CY_RTOS_AWARE

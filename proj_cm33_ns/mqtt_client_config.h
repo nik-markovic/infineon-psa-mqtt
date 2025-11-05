@@ -52,12 +52,12 @@
 /***************** MQTT CLIENT CONNECTION CONFIGURATION MACROS *****************/
 /* MQTT Broker/Server address and port used for the MQTT connection. */
 #define MQTT_BROKER_ADDRESS               ""
-#define MQTT_PORT                         1883
+#define MQTT_PORT                         8883
 
 /* Set this macro to 1 if a secure (TLS) connection to the MQTT Broker is
  * required to be established, else 0.
  */
-#define MQTT_SECURE_CONNECTION            ( 0 )
+#define MQTT_SECURE_CONNECTION            ( 1 )
 
 /* Configure the user credentials to be sent as part of MQTT CONNECT packet */
 #define MQTT_USERNAME                     "User"
@@ -145,7 +145,7 @@
  * Uncomment the below line and specify the SNI Host Name to use this extension
  * as specified by the MQTT Broker.
  */
-// #define MQTT_SNI_HOSTNAME                 "SNI_HOST_NAME"
+#define MQTT_SNI_HOSTNAME                 "SNI_HOST_NAME"
 
 /* A Network buffer is allocated for sending and receiving MQTT packets over
  * the network. Specify the size of this buffer using this macro.

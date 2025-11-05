@@ -68,6 +68,8 @@
 /* LwIP header files */
 #include "lwip/netif.h"
 #include "retarget_io_init.h"
+
+/* Application header files. */
 /******************************************************************************
 * Macros
 ******************************************************************************/
@@ -439,6 +441,9 @@ static cy_rslt_t mqtt_init(void)
         result = ~CY_RSLT_SUCCESS;
     }
     CHECK_RESULT(result, BUFFER_INITIALIZED, "Network Buffer allocation failed!\n\n");
+
+    extern void psa_mqtt_configure(cy_awsport_ssl_credentials_t *sec_info);
+    psa_mqtt_configure(security_info);
 
     /* Create the MQTT client instance. */
     result = cy_mqtt_create(mqtt_network_buffer, MQTT_NETWORK_BUFFER_SIZE,
