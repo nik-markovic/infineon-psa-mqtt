@@ -259,16 +259,21 @@ int main(void)
     /* Enable global interrupts. */
     __enable_irq();
     
+    extern void psa_test(void);
+    // psa_test();
+    extern void psa_mqtt_setup(void);
+    psa_mqtt_setup();
+    #if 0
     extern void psa_test_task(void *pvParameters);
+    psa_test_task(NULL);
     result = xTaskCreate(psa_test_task, "PSA Test", (1024 * 2),
                 NULL, MQTT_CLIENT_TASK_PRIORITY, NULL);
-    
+    #endif
     /* Create the MQTT Client task. */
-    #if 0
+    
     result = xTaskCreate(mqtt_client_task, "MQTT Client task", MQTT_CLIENT_TASK_STACK_SIZE,
                 NULL, MQTT_CLIENT_TASK_PRIORITY, NULL);
-    #endif
-
+    
     if( pdPASS == result )
     {
         /* Start the FreeRTOS scheduler. */

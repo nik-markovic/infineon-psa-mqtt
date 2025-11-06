@@ -7,12 +7,15 @@
 #include "mbedtls/ctr_drbg.h"
 #include "cy_tcpip_port_secure_sockets.h"
 
+#include "mbedtls/ecdsa.h"
+
 #define PSA_MQTT_KEY_ID (1U)
-#define CERT_BUFFER_SIZE (2048)
+#define CERT_BUFFER_SIZE (4096)
 
 static uint8_t g_cert_buffer[CERT_BUFFER_SIZE];
 static size_t g_cert_size = 0;
 static mbedtls_pk_context g_pk_context;
+static psa_key_id_t g_key_id;
 static int g_initialized = 0;
 
 /* Generate self-signed cert using PSA key for signing (based on iotc_gencert.c pattern) */
@@ -75,6 +78,7 @@ static int psa_generate_selfsigned_cert(mbedtls_pk_context *key)
 
     g_cert_size = ret;
     printf("PSA: Certificate generated, size=%zu\n", g_cert_size);
+    printf("Generated Certificate (PEM):\n%s\n", g_cert_buffer);
     ret = 0;
 
 exit:
@@ -126,8 +130,10 @@ void psa_mqtt_setup(void)
             return;
         }
         printf("PSA: Key generated, ID=%lu\n", (long unsigned)key_id);
+        g_key_id = key_id;
     } else {
         printf("PSA: Using existing key (pub_len=%zu)\n", exported_len);
+        g_key_id = key_id;
     }
 
     /* Setup MbedTLS PK context to use PSA key (opaque - private key never exposed) */
@@ -158,7 +164,9 @@ void psa_mqtt_configure(cy_awsport_ssl_credentials_t *sec_info)
     if (sec_info != NULL) {
         sec_info->client_cert = (const char *)g_cert_buffer;
         sec_info->client_cert_size = g_cert_size;
-        sec_info->private_key = (const char *)&g_pk_context;
-        sec_info->private_key_size = sizeof(mbedtls_pk_context);
+        sec_info->private_key = (const char *)&g_key_id;
+        sec_info->private_key_size = sizeof(psa_key_id_t);
     }
 }
+
+/* Dummy ALT implementation for ECDSA sign - removed since not using ALT */

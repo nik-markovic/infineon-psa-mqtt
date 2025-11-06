@@ -52,7 +52,7 @@
 #define WIFI_SSID                        "MY_WIFI_SSID"
 
 /* Passkey of the above mentioned Wi-Fi SSID. */
-#define WIFI_PASSWORD                     "MY_WIFI_PASSWORD"
+#define WIFI_PASSWORD                     "MYPASS122"
 
 /* Security type of the Wi-Fi access point. See 'cy_wcm_security_t' structure
  * in "cy_wcm.h" for more details.

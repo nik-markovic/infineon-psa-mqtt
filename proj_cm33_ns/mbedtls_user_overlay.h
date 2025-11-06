@@ -1,5 +1,3 @@
-
-
 #ifndef MBEDTLS_USER_OVERLAY_HEADER
 #define MBEDTLS_USER_OVERLAY_HEADER
 
@@ -15,5 +13,8 @@
 // PSA-based key data: Store EC keys as PSA opaque keys (PSA key handles instead of raw key material)
 // This ensures private keys are never exposed in user-space memory
 #define MBEDTLS_PK_USE_PSA_EC_DATA
+
+// Enable ALT signing to override ECDSA sign with PSA call
+// #define MBEDTLS_ECDSA_SIGN_ALT  // Removed to avoid library conflicts; use existing opaque PSA flow instead
 
 #endif /* MBEDTLS_USER_OVERLAY_HEADER */

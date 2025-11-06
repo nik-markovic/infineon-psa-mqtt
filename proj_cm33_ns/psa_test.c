@@ -242,7 +242,31 @@ void key_test()
 *******************************************************************************/
 
 int _write(int fd, const void *buf, size_t count) {
-    return (int) ifx_platform_log_msg((const uint8_t*)buf, count);
+    const char *input = (const char *)buf;
+    size_t start = 0;
+    static char prev_char = 0;
+
+    for (size_t i = 0; i < count; ++i) {
+        char c = input[i];
+        #ifdef CY_RETARGET_IO_CONVERT_LF_TO_CRLF
+        if (c == '\n' && prev_char != '\r') {
+            // Send accumulated chars before this \n
+            if (i > start) {
+                ifx_platform_log_msg((const uint8_t *)&input[start], i - start);
+            }
+            // Send \r
+            const char cr = '\r';
+            ifx_platform_log_msg((const uint8_t *)&cr, 1);
+            start = i;  // Next send starts at this \n
+        }
+        #endif
+        prev_char = c;
+    }
+    // Send remaining chars
+    if (start < count) {
+        ifx_platform_log_msg((const uint8_t *)&input[start], count - start);
+    }
+    return (int)count;
 }
 
 void psa_test(void)
