@@ -38,6 +38,8 @@
 #include "ifx_platform_api.h"
 #include "psa/crypto.h"
 
+#include "mbedtls/pk.h" // for pem test
+
 
 /*******************************************************************************
 * Macros
@@ -90,6 +92,8 @@ static uint32_t checksum32(const uint8_t *buf, size_t len)
 
 #include "psa/crypto.h"
 #include <string.h>
+
+#define MQTT_KEY_ID 9U
 
 #define SHA256_SZ   32
 #define SIG_MAX_SZ  72          /* ECDSA P-256 DER max */
@@ -161,6 +165,7 @@ hash_exit:
     return status;
 }
 
+
 void key_test()
 {
     enum {
@@ -170,7 +175,7 @@ void key_test()
     size_t exported_length = 0;
     static uint8_t exported[PSA_KEY_EXPORT_ECC_PUBLIC_KEY_MAX_SIZE(key_bits)];
     psa_key_attributes_t attributes = PSA_KEY_ATTRIBUTES_INIT;
-    psa_key_id_t key_id = PSA_KEY_ID_USER_MIN;
+    psa_key_id_t key_id = MQTT_KEY_ID;
 
     print_msg("Generate a key pair...\t");
 
@@ -181,13 +186,18 @@ void key_test()
         return;
     }
     status = psa_export_public_key(key_id, exported, sizeof(exported), &exported_length);
+    #if 0
+    status = -1 ; // trigger RECREATE
+    print_msg("################ FORCED KEY RECREATE ################\r\n");
+    psa_destroy_key(MQTT_KEY_ID);
+    #endif
     if (status != PSA_SUCCESS) {
         /* Generate a key */
-        psa_set_key_id(&attributes, key_id); 
+        psa_set_key_id(&attributes, MQTT_KEY_ID); 
         psa_set_key_lifetime(&attributes, PSA_KEY_LIFETIME_PERSISTENT);
         psa_set_key_usage_flags(&attributes, PSA_KEY_USAGE_SIGN_HASH);
         psa_set_key_algorithm(&attributes,
-                            PSA_ALG_DETERMINISTIC_ECDSA(PSA_ALG_SHA_256));
+                            PSA_ALG_ECDSA(PSA_ALG_SHA_256));
         psa_set_key_type(&attributes,
                         PSA_KEY_TYPE_ECC_KEY_PAIR(PSA_ECC_FAMILY_SECP_R1));
         psa_set_key_bits(&attributes, key_bits);
@@ -271,7 +281,6 @@ int _write(int fd, const void *buf, size_t count) {
 
 void psa_test(void)
 {
-    cy_rslt_t result;
     uint32_t rslt;
     char set_data[] = "Hello World";
     char get_data[ITS_BUFF_SIZE] = {0};
@@ -282,6 +291,7 @@ void psa_test(void)
 
     /* Initialize the device and board peripherals */
 #if 0
+    cy_rslt_t result;
     result = cybsp_init();
 
     /* Board init failed. Stop program execution */

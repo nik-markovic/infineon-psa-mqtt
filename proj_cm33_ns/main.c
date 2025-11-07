@@ -246,7 +246,7 @@ int main(void)
     setup_clib_support();
 
     /* \x1b[2J\x1b[;H - ANSI ESC sequence to clear screen. */
-    printf("\x1b[2J\x1b[;H");
+    // printf("\x1b[2J\x1b[;H");
     printf("===============================================================\n");
 
     printf("PSOC Edge MCU: Wi-Fi MQTT Client\n");
@@ -261,8 +261,10 @@ int main(void)
     
     extern void psa_test(void);
     // psa_test();
+
     extern void psa_mqtt_setup(void);
     psa_mqtt_setup();
+
     #if 0
     extern void psa_test_task(void *pvParameters);
     psa_test_task(NULL);
