@@ -100,7 +100,6 @@ int generate_selfsigned_cert_psa(mbedtls_pk_context *key, unsigned char* der_buf
         goto exit;
     }
     printf("Cert DER Size: %d\n", ret);
-    return ret;
 
     /* DER is written to the end of the buffer, move to beginning */
     memmove(der_buffer, der_buffer + der_buffer_len - ret, ret);

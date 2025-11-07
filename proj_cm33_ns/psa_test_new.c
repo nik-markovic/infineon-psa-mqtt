@@ -68,8 +68,6 @@ bool validate_key(psa_key_id_t key_id) {
 void psa_mqtt_setup(void) {
     psa_status_t status;
     psa_key_attributes_t attributes = PSA_KEY_ATTRIBUTES_INIT;
-    mbedtls_pk_context pk_context;
-
 
     /* Initialize TF-M interface */
     if (0 != tfm_ns_interface_init()) {
@@ -84,15 +82,14 @@ void psa_mqtt_setup(void) {
     
     /* Clear ITS and key for testing as needed */
     #if 0
+    // leftover by other tests:
     psa_its_remove(1U);
     psa_destroy_key(9U);
+    // the actuals:
     psa_its_remove(CRT_DER_ITS_UID);
     psa_destroy_key(PSA_MQTT_KEY_ID);
     printf("##########    KEY FORCEFULLY RECREATED    ############\n");
     #endif
-
-    /* Setup MbedTLS PK context */
-    mbedtls_pk_init(&pk_context);
 
     /* Initialize PSA Crypto */
     status = psa_crypto_init();
@@ -128,15 +125,16 @@ void psa_mqtt_setup(void) {
         int pem_ret = mbedtls_pem_write_buffer(
             "-----BEGIN CERTIFICATE-----\n",
             "-----END CERTIFICATE-----\n",
-            der_data->buff, sizeof(der_data->buff),
+            der_data->buff, der_data->hdr.size,
             (unsigned char*)crt_pem_buffer, sizeof(crt_pem_buffer) - 1, &bytes_written_or_required
         );
+        free(der_data); // done with the buffer
+        der_data = NULL;
+
         if (pem_ret == 0) {
             // make sure to null-terminate on success. I think the call will not do it
             crt_pem_buffer[bytes_written_or_required] = '\0';
             printf("Loaded Certificate (PEM):\n%s\n", crt_pem_buffer);
-            free(der_data); // done with the buffer
-            der_data = NULL;
         } else {
             printf("Failed to convert DER to PEM for printing. Error was %d\n", pem_ret);
             goto error_cleanup;
@@ -164,9 +162,13 @@ void psa_mqtt_setup(void) {
 
         key_id = PSA_MQTT_KEY_ID;
 
+        mbedtls_pk_context pk_context;
+        mbedtls_pk_init(&pk_context);
         status = mbedtls_pk_setup_opaque(&pk_context, key_id);
+        /* Setup MbedTLS PK context */
         if (status != PSA_SUCCESS) {
             printf("mbedtls_pk_setup_opaque failed: 0x%lx\n", (long)status);
+            mbedtls_pk_free(&pk_context);
             goto error_cleanup;
         }
 
@@ -176,6 +178,7 @@ void psa_mqtt_setup(void) {
         int cert_ret = generate_selfsigned_cert_psa(&pk_context, der_data->buff, sizeof(der_data->buff));
             if (cert_ret < 0) {
                 printf("Certificate generation failed: %d\n", cert_ret);
+                mbedtls_pk_free(&pk_context);
                 goto error_cleanup;
             }
         der_data->hdr.size = cert_ret;
@@ -183,19 +186,24 @@ void psa_mqtt_setup(void) {
         status = psa_its_set(CRT_DER_ITS_UID, sizeof(crt_der_data_t), der_data, PSA_STORAGE_FLAG_NONE);
         if (status != PSA_SUCCESS) {
             printf("Failed to store cert in ITS: 0x%d\n", (int) status);
+            mbedtls_pk_free(&pk_context);
             goto error_cleanup;
         } else {
             printf("PSA: Cert stored in ITS\n");
         }
+        mbedtls_pk_free(&pk_context);
 
         /* Convert DER to PEM for printing */
         size_t bytes_written_or_required;
         int pem_ret = mbedtls_pem_write_buffer(
             "-----BEGIN CERTIFICATE-----\n",
             "-----END CERTIFICATE-----\n",
-            der_data->buff, sizeof(der_data->buff),
+            der_data->buff, der_data->hdr.size,
             (unsigned char*)crt_pem_buffer, sizeof(crt_pem_buffer) - 1, &bytes_written_or_required
         );
+        free(der_data); // done with the buffer
+        der_data = NULL;
+
         if (pem_ret == 0) {
             // make sure to null-terminate on success. I think the call will not do it
             crt_pem_buffer[bytes_written_or_required] = '\0';
@@ -215,7 +223,6 @@ error_cleanup:
     key_id = PSA_KEY_ID_NULL;
     psa_its_remove(CRT_DER_ITS_UID);
     psa_destroy_key(PSA_MQTT_KEY_ID);
-    mbedtls_pk_free(&pk_context);
     if (der_data) {
         free(der_data);
     }

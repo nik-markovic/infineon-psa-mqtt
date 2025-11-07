@@ -187,9 +187,9 @@ void key_test()
     }
     status = psa_export_public_key(key_id, exported, sizeof(exported), &exported_length);
     #if 0
-    status = -1 ; // trigger RECREATE
     print_msg("################ FORCED KEY RECREATE ################\r\n");
     psa_destroy_key(MQTT_KEY_ID);
+    status = -1 ; // trigger RECREATE
     #endif
     if (status != PSA_SUCCESS) {
         /* Generate a key */
