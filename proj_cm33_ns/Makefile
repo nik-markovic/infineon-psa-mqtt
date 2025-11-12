@@ -85,7 +85,8 @@ DEFINES+=$(MBEDTLSFLAGS) CYBSP_WIFI_CAPABLE CY_RETARGET_IO_CONVERT_LF_TO_CRLF CY
 # Default configuration of mbedtls library.
 DEFINES+=MBEDTLS_CONFIG_FILE='"mbedtls/mbedtls_config.h"'
 # PSA configuration of mbedtls library.
-DEFINES+=MBEDTLS_PSA_CRYPTO_CONFIG_FILE='"configs/ifx_psa_crypto_config.h"'
+#DEFINES+=MBEDTLS_PSA_CRYPTO_CONFIG_FILE='"configs/ifx_psa_crypto_config.h"'
+DEFINES+=MBEDTLS_PSA_CRYPTO_CONFIG_FILE='"crypto_config_profile_large.h"'
 
 # Enable PSA support
 DEFINES+=CY_TFM_PSA_SUPPORTED TFM_MULTI_CORE_NS_OS # CY_SECURE_SOCKETS_PKCS_SUPPORT
@@ -93,6 +94,14 @@ DEFINES+=CY_TFM_PSA_SUPPORTED TFM_MULTI_CORE_NS_OS # CY_SECURE_SOCKETS_PKCS_SUPP
 # for sntp
 DEFINES+=SNTP_SERVER_DNS
 
+
+# for better visibility
+DEFINES+=ENABLE_MQTT_LOGS
+DEFINES+=ENABLE_SECURE_SOCKETS_LOGS
+DEFINES+=ENABLE_AWS_PORT_LOGS
+
+# Neccessary mbedtls hack to work around PSA issues
+DEFINES+=IOTC_MBEDTLS_HACK_MAX_SIZE
 
 
 ifeq ($(TOOLCHAIN),LLVM_ARM)
