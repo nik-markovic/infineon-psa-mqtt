@@ -87,11 +87,6 @@ DEFINES+=
 TFM_CONFIGURE_EXT_OPTIONS+= -DTFM_EXCEPTION_INFO_DUMP=ON -DPLATFORM_EXCEPTION_INFO=ON -DIFX_FAULTS_INFO_DUMP=ON -DTFM_SPM_LOG_LEVEL=TFM_SPM_LOG_LEVEL_DEBUG -DTFM_PARTITION_LOG_LEVEL=TFM_PARTITION_LOG_LEVEL_DEBUG
 TFM_CONFIGURE_EXT_OPTIONS+= -DCONFIG_TFM_HALT_ON_CORE_PANIC:BOOL=ON
 
-# Secure-side PSA crypto overlay: minimally enable AES-GCM for TLS record AEAD
-# without changing the base profile. This header includes the medium profile
-# and then defines PSA_WANT_ALG_GCM=1.
-TFM_CONFIGURE_EXT_OPTIONS+= -DMBEDTLS_PSA_CRYPTO_CONFIG_FILE=$(call TFM_PATH_MIXED,$(CURDIR)/psa_crypto_config_overlay.h)
-
 # Select softfp or hardfp floating point. Default is softfp.
 VFP_SELECT+=
 

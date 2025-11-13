@@ -124,21 +124,24 @@ AWS IoT Core is using ECDH key exchange with RSA signature (ECDHE-RSA cipher sui
 
 #define MBEDTLS_DEBUG_C
 
-
-/*
- * Appended (non-intrusive) TLS fragment sizing
- * - Keep original overlay content intact; just clamp TLS content length here.
- * - Enable the Max Fragment Length extension build-time support.
- * Note: Advertising MFL still depends on runtime calling mbedtls_ssl_conf_max_frag_len().
- */
-#ifndef MBEDTLS_SSL_MAX_FRAGMENT_LENGTH
-#define MBEDTLS_SSL_MAX_FRAGMENT_LENGTH
-#endif
+#if 1
+    /*
+    * Appended (non-intrusive) TLS fragment sizing
+    * - Keep original overlay content intact; just clamp TLS content length here.
+    * - Enable the Max Fragment Length extension build-time support.
+    * Note: Advertising MFL still depends on runtime calling mbedtls_ssl_conf_max_frag_len().
+    */
+    #if 0
+    #ifndef MBEDTLS_SSL_MAX_FRAGMENT_LENGTH
+    #define MBEDTLS_SSL_MAX_FRAGMENT_LENGTH
+    #endif
+    #endif
 
 #undef MBEDTLS_SSL_IN_CONTENT_LEN
-#define MBEDTLS_SSL_IN_CONTENT_LEN 2048
+#define MBEDTLS_SSL_IN_CONTENT_LEN 4096
 
 #undef MBEDTLS_SSL_OUT_CONTENT_LEN
-#define MBEDTLS_SSL_OUT_CONTENT_LEN 2048
+#define MBEDTLS_SSL_OUT_CONTENT_LEN 4096
+#endif
 
 #endif /* MBEDTLS_USER_OVERLAY_HEADER */

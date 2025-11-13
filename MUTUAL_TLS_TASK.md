@@ -387,6 +387,27 @@ Breakpoint at ssl_tls12_client.c:2799. psa_export_public_key fails with PSA_ERRO
 - Next: Re-run handshake to confirm smaller record sizes and successful ECDH public key export and AEAD operations.
 
 
+## Session 11: USER NOTE - Fix handshake but TLS packets broken:
 
+MANUALLY modified p-tfm-mqtt\bsps\TARGET_APP_KIT_PSE84_EVAL_EPC2\config\tfm_config\tfm_config.cmake
+to use TFM_PROFILE=profile_large. 
+
+When I made this change the call to mbedtls_ssl_encrypt_buf() -> psa_aead_encrypt() at  ssl_msg.c:901 was successful and the whole handshake succeeded and we connected to the server. MQTT app was ready to go, but publish was failing probably due to issue with fragment size.
+
+With MBEDTLS_SSL_MAX_FRAGMENT_LENGTH, MBEDTLS_SSL_IN_CONTENT_LEN 2048 and MBEDTLS_SSL_OUT_CONTENT_LEN 2048 the error reported was "netconn_recv_tcp_pbuf returned -3" "cy_tls_recv failed with error 136708098". 
+
+When disabling the limit tweaks, the psa_sign was failing with PSA_ERROR_INSUFFICIENT_MEMORY. 
+
+In the past, I have seen PSA_ERROR_INSUFFICIENT_MEMORY being returned from calls which were supposed to succeed because the result would be much smaller anyways.
+
+These tweaks still exist and are driven by 33_ns makefile:
+Necessary mbedtls hack to work around PSA issues
+DEFINES+=IOTC_MBEDTLS_HACK_MAX_SIZE
+
+...and for example in ssl_write_client_key_exchange(), when we only need a handful of bytest overriding own_pubkey_max_len from 16k to 256 would succeed the call.
+
+We don't need the full buffer, 16k is there for convenience but PSA prematurely decides that it is out of memory even though it can write into the larger buffer whatever it needs to write. It will return the written length anyways.
+
+With this in min we have to figure out how to properly proceed with the fix from here.
 
 
