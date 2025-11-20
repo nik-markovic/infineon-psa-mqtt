@@ -100,8 +100,9 @@ DEFINES+=ENABLE_MQTT_LOGS
 DEFINES+=ENABLE_SECURE_SOCKETS_LOGS
 DEFINES+=ENABLE_AWS_PORT_LOGS
 
-# Neccessary mbedtls hack to work around PSA issues
-DEFINES+=IOTC_MBEDTLS_HACK_MAX_SIZE
+# Neccessary mbedtls hack to work around PSA size and print issues
+DEFINES+=IOTC_SIZE_HACKS
+DEFINES+=IOTC_PRINT_HACKS
 
 
 ifeq ($(TOOLCHAIN),LLVM_ARM)

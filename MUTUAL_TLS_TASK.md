@@ -401,8 +401,79 @@ When disabling the limit tweaks, the psa_sign was failing with PSA_ERROR_INSUFFI
 In the past, I have seen PSA_ERROR_INSUFFICIENT_MEMORY being returned from calls which were supposed to succeed because the result would be much smaller anyways.
 
 These tweaks still exist and are driven by 33_ns makefile:
-Necessary mbedtls hack to work around PSA issues
-DEFINES+=IOTC_MBEDTLS_HACK_MAX_SIZE
+Necessary mbedtls hack to work around PSA size and print spamming issues
+DEFINES+=IOTC_SIZE_HACKS
+DEFINES+=IOTC_PRINT_HACKS
+
+Summary of hacks:
+
+1. **PSA Buffer Size Workaround (`IOTC_SIZE_HACKS`)**:
+   - **Issue**: PSA returns `PSA_ERROR_INSUFFICIENT_MEMORY` when output buffers are large (e.g., 16KB), even if the actual output is small.
+   - **Fix**: Cap buffer sizes passed to PSA to 256 bytes where appropriate.
+   
+   **Location 1**: `mtb_shared/ifx-mbedtls/release-v3.6.400/library/pk_wrap.c` (around line 713, inside `pk_sign_wrap`):
+   ```c
+    key_bits = psa_get_key_bits(&key_attr);
+    psa_reset_key_attributes(&key_attr);
+    #ifdef IOTC_SIZE_HACKS
+    // inject hacks here:
+    if (sig_size > 256) sig_size = 256;
+    #endif
+
+    status = psa_sign_hash(key_id,
+   ```
+
+   **Location 2**: `mtb_shared/ifx-mbedtls/release-v3.6.400/library/ssl_tls12_client.c` (around line 2797, inside `ssl_write_client_key_exchange`):
+   ```c
+        unsigned char *end = ssl->out_msg + MBEDTLS_SSL_OUT_CONTENT_LEN;
+        size_t own_pubkey_max_len = (size_t) (end - own_pubkey);
+        #ifdef IOTC_SIZE_HACKS
+        // inject hacks here
+        own_pubkey_max_len = 256;
+        #endif
+        size_t own_pubkey_len;
+
+        status = psa_export_public_key(handshake->xxdh_psa_privkey,
+   ```
+
+2. **Log Suppression (`IOTC_PRINT_HACKS`)**:
+   - **Issue**: Excessive log spam during receive timeouts or expected network behavior.
+   - **Fix**: Suppress specific error logs when the return code indicates a timeout.
+
+   **Location 1**: `mtb_shared/secure-sockets/release-v3.12.0/source/COMPONENT_LWIP/cy_secure_sockets.c` (around line 3593, inside `cy_socket_recv`):
+   ```c
+        /* Send through TLS pipe, if negotiated. */
+        ret = cy_tls_recv(ctx->tls_ctx, data, size, 0, bytes_received);
+        if(ret != CY_RSLT_SUCCESS)
+        {
+#ifdef IOTC_PRINT_HACKS
+            if (ret != CY_RSLT_MODULE_TLS_TIMEOUT)
+            {
+                ss_cy_log_msg(CYLF_MIDDLEWARE, CY_LOG_ERR, "cy_tls_recv failed with error %ld\n", ret);
+            }
+#else
+            ss_cy_log_msg(CYLF_MIDDLEWARE, CY_LOG_ERR, "cy_tls_recv failed with error %ld\n", ret);
+#endif
+            ret = TLS_TO_CY_SECURE_SOCKETS_ERR(ret);
+        }
+   ```
+
+   **Location 2**: `mtb_shared/secure-sockets/release-v3.12.0/source/COMPONENT_LWIP/cy_secure_sockets.c` (around line 1329, inside `network_receive`):
+   ```c
+                else
+                {
+#ifdef IOTC_PRINT_HACKS
+                    if (ret != ERR_TIMEOUT)
+                    {
+                        ss_cy_log_msg(CYLF_MIDDLEWARE, CY_LOG_ERR, "netconn_recv_tcp_pbuf returned %d\n", ret);
+                    }
+#else
+                    ss_cy_log_msg(CYLF_MIDDLEWARE, CY_LOG_ERR, "netconn_recv_tcp_pbuf returned %d\n", ret);
+#endif
+                    return LWIP_TO_CY_SECURE_SOCKETS_ERR(ret);
+                }
+   ```
+
 
 ...and for example in ssl_write_client_key_exchange(), when we only need a handful of bytest overriding own_pubkey_max_len from 16k to 256 would succeed the call.
 

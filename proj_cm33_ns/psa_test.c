@@ -250,32 +250,38 @@ void key_test()
 *  int
 *
 *******************************************************************************/
+static void write_safe(const uint8_t *data, uint32_t len) {
+    uint32_t offset = 0;
+    while (offset < len) {
+        uint32_t remain = len - offset;
+        uint32_t req = remain > 32 ? 32 : remain;   /* <- fixed */
+        uint32_t n   = (uint32_t)ifx_platform_log_msg(data + offset, req);
+        offset += n;
+        if (xTaskGetSchedulerState() == taskSCHEDULER_RUNNING) {
+            vTaskDelay(pdMS_TO_TICKS(n / 10 + 1));
+        }
+    }
+}
 
 int _write(int fd, const void *buf, size_t count) {
     const char *input = (const char *)buf;
     size_t start = 0;
-    static char prev_char = 0;
-
+    
+    #ifndef CY_RETARGET_IO_CONVERT_LF_TO_CRLF
+    write_safe((const uint8_t *)buf, count);
+    #else
     for (size_t i = 0; i < count; ++i) {
-        char c = input[i];
-        #ifdef CY_RETARGET_IO_CONVERT_LF_TO_CRLF
-        if (c == '\n' && prev_char != '\r') {
-            // Send accumulated chars before this \n
-            if (i > start) {
-                ifx_platform_log_msg((const uint8_t *)&input[start], i - start);
-            }
-            // Send \r
-            const char cr = '\r';
-            ifx_platform_log_msg((const uint8_t *)&cr, 1);
-            start = i;  // Next send starts at this \n
+        if (input[i] == '\n' && (i == 0 || input[i - 1] != '\r')) {
+            write_safe((const uint8_t *)&input[start], i - start);
+            write_safe((const uint8_t *)"\r\n", 2);
+            start = i + 1;
         }
-        #endif
-        prev_char = c;
     }
-    // Send remaining chars
     if (start < count) {
-        ifx_platform_log_msg((const uint8_t *)&input[start], count - start);
+        write_safe((const uint8_t *)&input[start], count - start);
     }
+    #endif
+    
     return (int)count;
 }
 
@@ -320,17 +326,17 @@ void psa_test(void)
                 "******* "
                 "PSOC Edge MCU: Basic Trusted Firmware-M (TF-M) based Application "
                 "******* \r\n\n");
-    ifx_platform_log_msg(out_buf, buf_size);
+    write_safe(out_buf, buf_size);
 
 
     buf_size = sprintf((char*)out_buf, "*** TF-M Internal Trusted Storage (ITS) service ***\r\n\n");
-    ifx_platform_log_msg(out_buf, buf_size);
+    write_safe(out_buf, buf_size);
 
     buf_size = sprintf((char*)out_buf, "ITS Storage data: %s\r\n", set_data);
-    ifx_platform_log_msg(out_buf, buf_size);
+    write_safe(out_buf, buf_size);
 
     buf_size = sprintf((char*)out_buf, "Storing data in ITS...\r\n\n");
-    ifx_platform_log_msg(out_buf, buf_size);
+    write_safe(out_buf, buf_size);
 
     /* Start of Internal Trusted Storage code.
      * Internal Trusted Storage can store upto 10 assets. The maximum size of asset
@@ -343,7 +349,7 @@ void psa_test(void)
     }
 
     buf_size = sprintf((char*)out_buf, "Retrieving data from ITS...\r\n");
-    ifx_platform_log_msg(out_buf, buf_size);
+    write_safe(out_buf, buf_size);
 
     status = psa_its_get(ITS_UID, 0, sizeof(set_data), get_data, &get_len);
     if(status != PSA_SUCCESS)
@@ -352,7 +358,7 @@ void psa_test(void)
     }
 
     buf_size = sprintf((char*)out_buf, "Retrieved data: %s\r\n\n", get_data);
-    ifx_platform_log_msg(out_buf, buf_size);
+    write_safe(out_buf, buf_size);
 
     key_test();
 

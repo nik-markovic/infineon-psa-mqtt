@@ -237,7 +237,7 @@ error_cleanup:
 void psa_mqtt_inject_credentials(cy_awsport_ssl_credentials_t *sec_info) {
 
     // TEMP: Test PSA support
-    test_psa_algorithms();
+    // test_psa_algorithms();
 
     if (sec_info == NULL) {
         printf("Error: sec_info is NULL!\n");

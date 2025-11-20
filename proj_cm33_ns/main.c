@@ -39,6 +39,7 @@
 *******************************************************************************/
 
 /* Header file includes */
+#include "cy_log.h"
 #include "cybsp.h"
 #include "retarget_io_init.h"
 #include "mqtt_task.h"
@@ -202,11 +203,12 @@ static void setup_clib_support(void)
 
 
 int app_log_output_callback(CY_LOG_FACILITY_T facility, CY_LOG_LEVEL_T level, char *logmsg) {
-  (void)facility;     // Can be used to decide to reduce output or send output to remote logging
-  (void)level;        // Can be used to decide to reduce output, although the output has already been
+    (void)facility;     // Can be used to decide to reduce output or send output to remote logging
+    (void)level;        // Can be used to decide to reduce output, although the output has already been
                       // limited by the log routines
 
-  return printf( "%s\n", logmsg);   // print directly to console
+    return printf(logmsg);
+  
 }
 
 cy_rslt_t app_log_time(uint32_t* time) {
@@ -265,9 +267,7 @@ int main(void)
     /* \x1b[2J\x1b[;H - ANSI ESC sequence to clear screen. */
     // printf("\x1b[2J\x1b[;H");
     printf("===============================================================\n");
-
     printf("PSOC Edge MCU: Wi-Fi MQTT Client\n");
-
     printf("===============================================================\n\n");
 
     /* Enable CM55. CY_CORTEX_M55_APPL_ADDR must be updated if CM55 memory layout is changed. */
@@ -276,11 +276,11 @@ int main(void)
     /* Enable global interrupts. */
     __enable_irq();
     
-    cy_log_init(CY_LOG_WARNING, app_log_output_callback, app_log_time);
+    cy_log_init(CY_LOG_ERR, app_log_output_callback, app_log_time);
 
     // Uncomment this line to get more info from HTTP and similar
     // if encountering issues
-    cy_log_set_facility_level(CYLF_MIDDLEWARE, CY_LOG_INFO);
+    cy_log_set_facility_level(CYLF_MIDDLEWARE, CY_LOG_WARNING);
 
     extern void psa_test(void);
     // psa_test();
