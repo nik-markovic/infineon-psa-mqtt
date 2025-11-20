@@ -38,6 +38,8 @@
 #include "ifx_platform_api.h"
 #include "psa/crypto.h"
 
+#include "mbedtls/pk.h" // for pem test
+
 
 /*******************************************************************************
 * Macros
@@ -90,6 +92,8 @@ static uint32_t checksum32(const uint8_t *buf, size_t len)
 
 #include "psa/crypto.h"
 #include <string.h>
+
+#define MQTT_KEY_ID 9U
 
 #define SHA256_SZ   32
 #define SIG_MAX_SZ  72          /* ECDSA P-256 DER max */
@@ -161,6 +165,7 @@ hash_exit:
     return status;
 }
 
+
 void key_test()
 {
     enum {
@@ -170,7 +175,7 @@ void key_test()
     size_t exported_length = 0;
     static uint8_t exported[PSA_KEY_EXPORT_ECC_PUBLIC_KEY_MAX_SIZE(key_bits)];
     psa_key_attributes_t attributes = PSA_KEY_ATTRIBUTES_INIT;
-    psa_key_id_t key_id = PSA_KEY_ID_USER_MIN;
+    psa_key_id_t key_id = MQTT_KEY_ID;
 
     print_msg("Generate a key pair...\t");
 
@@ -181,13 +186,18 @@ void key_test()
         return;
     }
     status = psa_export_public_key(key_id, exported, sizeof(exported), &exported_length);
+    #if 0
+    print_msg("################ FORCED KEY RECREATE ################\r\n");
+    psa_destroy_key(MQTT_KEY_ID);
+    status = -1 ; // trigger RECREATE
+    #endif
     if (status != PSA_SUCCESS) {
         /* Generate a key */
-        psa_set_key_id(&attributes, key_id); 
+        psa_set_key_id(&attributes, MQTT_KEY_ID); 
         psa_set_key_lifetime(&attributes, PSA_KEY_LIFETIME_PERSISTENT);
         psa_set_key_usage_flags(&attributes, PSA_KEY_USAGE_SIGN_HASH);
         psa_set_key_algorithm(&attributes,
-                            PSA_ALG_DETERMINISTIC_ECDSA(PSA_ALG_SHA_256));
+                            PSA_ALG_ECDSA(PSA_ALG_SHA_256));
         psa_set_key_type(&attributes,
                         PSA_KEY_TYPE_ECC_KEY_PAIR(PSA_ECC_FAMILY_SECP_R1));
         psa_set_key_bits(&attributes, key_bits);
@@ -240,14 +250,43 @@ void key_test()
 *  int
 *
 *******************************************************************************/
+static void write_safe(const uint8_t *data, uint32_t len) {
+    uint32_t offset = 0;
+    while (offset < len) {
+        uint32_t remain = len - offset;
+        uint32_t req = remain > 32 ? 32 : remain;   /* <- fixed */
+        uint32_t n   = (uint32_t)ifx_platform_log_msg(data + offset, req);
+        offset += n;
+        if (xTaskGetSchedulerState() == taskSCHEDULER_RUNNING) {
+            vTaskDelay(pdMS_TO_TICKS(n / 10 + 1));
+        }
+    }
+}
 
 int _write(int fd, const void *buf, size_t count) {
-    return (int) ifx_platform_log_msg((const uint8_t*)buf, count);
+    const char *input = (const char *)buf;
+    size_t start = 0;
+    
+    #ifndef CY_RETARGET_IO_CONVERT_LF_TO_CRLF
+    write_safe((const uint8_t *)buf, count);
+    #else
+    for (size_t i = 0; i < count; ++i) {
+        if (input[i] == '\n' && (i == 0 || input[i - 1] != '\r')) {
+            write_safe((const uint8_t *)&input[start], i - start);
+            write_safe((const uint8_t *)"\r\n", 2);
+            start = i + 1;
+        }
+    }
+    if (start < count) {
+        write_safe((const uint8_t *)&input[start], count - start);
+    }
+    #endif
+    
+    return (int)count;
 }
 
 void psa_test(void)
 {
-    cy_rslt_t result;
     uint32_t rslt;
     char set_data[] = "Hello World";
     char get_data[ITS_BUFF_SIZE] = {0};
@@ -258,6 +297,7 @@ void psa_test(void)
 
     /* Initialize the device and board peripherals */
 #if 0
+    cy_rslt_t result;
     result = cybsp_init();
 
     /* Board init failed. Stop program execution */
@@ -286,17 +326,17 @@ void psa_test(void)
                 "******* "
                 "PSOC Edge MCU: Basic Trusted Firmware-M (TF-M) based Application "
                 "******* \r\n\n");
-    ifx_platform_log_msg(out_buf, buf_size);
+    write_safe(out_buf, buf_size);
 
 
     buf_size = sprintf((char*)out_buf, "*** TF-M Internal Trusted Storage (ITS) service ***\r\n\n");
-    ifx_platform_log_msg(out_buf, buf_size);
+    write_safe(out_buf, buf_size);
 
     buf_size = sprintf((char*)out_buf, "ITS Storage data: %s\r\n", set_data);
-    ifx_platform_log_msg(out_buf, buf_size);
+    write_safe(out_buf, buf_size);
 
     buf_size = sprintf((char*)out_buf, "Storing data in ITS...\r\n\n");
-    ifx_platform_log_msg(out_buf, buf_size);
+    write_safe(out_buf, buf_size);
 
     /* Start of Internal Trusted Storage code.
      * Internal Trusted Storage can store upto 10 assets. The maximum size of asset
@@ -309,7 +349,7 @@ void psa_test(void)
     }
 
     buf_size = sprintf((char*)out_buf, "Retrieving data from ITS...\r\n");
-    ifx_platform_log_msg(out_buf, buf_size);
+    write_safe(out_buf, buf_size);
 
     status = psa_its_get(ITS_UID, 0, sizeof(set_data), get_data, &get_len);
     if(status != PSA_SUCCESS)
@@ -318,7 +358,7 @@ void psa_test(void)
     }
 
     buf_size = sprintf((char*)out_buf, "Retrieved data: %s\r\n\n", get_data);
-    ifx_platform_log_msg(out_buf, buf_size);
+    write_safe(out_buf, buf_size);
 
     key_test();
 

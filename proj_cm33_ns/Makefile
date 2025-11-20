@@ -75,8 +75,9 @@ SOURCES=
 INCLUDES=
 
 # Custom configuration of mbedtls library.
-# This will be picked up from wifi-core-freertos-lwip-mbedtls/configs
-MBEDTLSFLAGS = MBEDTLS_USER_CONFIG_FILE='"configs/mbedtls_user_config.h"'
+# This file will override what we picked up from wifi-core-freertos-lwip-mbedtls/configs
+# @see: proj_cm33_ns/mbedtls_user_overlay.h
+MBEDTLSFLAGS=MBEDTLS_USER_CONFIG_FILE='"mbedtls_user_overlay.h"'
 
 # Add additional defines to the build process (without a leading -D).
 DEFINES+=$(MBEDTLSFLAGS) CYBSP_WIFI_CAPABLE CY_RETARGET_IO_CONVERT_LF_TO_CRLF CY_RTOS_AWARE
@@ -84,14 +85,23 @@ DEFINES+=$(MBEDTLSFLAGS) CYBSP_WIFI_CAPABLE CY_RETARGET_IO_CONVERT_LF_TO_CRLF CY
 # Default configuration of mbedtls library.
 DEFINES+=MBEDTLS_CONFIG_FILE='"mbedtls/mbedtls_config.h"'
 # PSA configuration of mbedtls library.
-DEFINES+=MBEDTLS_PSA_CRYPTO_CONFIG_FILE='"configs/ifx_psa_crypto_config.h"'
+DEFINES+=MBEDTLS_PSA_CRYPTO_CONFIG_FILE='"crypto_config_profile_large.h"'
 
 # Enable PSA support
-DEFINES+=CY_TFM_PSA_SUPPORTED TFM_MULTI_CORE_NS_OS # CY_SECURE_SOCKETS_PKCS_SUPPORT 
+DEFINES+=CY_TFM_PSA_SUPPORTED TFM_MULTI_CORE_NS_OS # CY_SECURE_SOCKETS_PKCS_SUPPORT
 
 # for sntp
 DEFINES+=SNTP_SERVER_DNS
 
+
+# for better visibility
+DEFINES+=ENABLE_MQTT_LOGS
+DEFINES+=ENABLE_SECURE_SOCKETS_LOGS
+DEFINES+=ENABLE_AWS_PORT_LOGS
+
+# Neccessary mbedtls hack to work around PSA size and print issues
+DEFINES+=IOTC_SIZE_HACKS
+DEFINES+=IOTC_PRINT_HACKS
 
 
 ifeq ($(TOOLCHAIN),LLVM_ARM)

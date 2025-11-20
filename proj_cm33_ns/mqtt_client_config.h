@@ -51,23 +51,23 @@
 
 /***************** MQTT CLIENT CONNECTION CONFIGURATION MACROS *****************/
 /* MQTT Broker/Server address and port used for the MQTT connection. */
-#define MQTT_BROKER_ADDRESS               ""
-#define MQTT_PORT                         1883
+#define MQTT_BROKER_ADDRESS               "a3etk4e19usyja-ats.iot.us-east-1.amazonaws.com"
+#define MQTT_PORT                         8883
 
 /* Set this macro to 1 if a secure (TLS) connection to the MQTT Broker is
  * required to be established, else 0.
  */
-#define MQTT_SECURE_CONNECTION            ( 0 )
+#define MQTT_SECURE_CONNECTION            ( 1 )
 
 /* Configure the user credentials to be sent as part of MQTT CONNECT packet */
-#define MQTT_USERNAME                     "User"
+#define MQTT_USERNAME                     ""
 #define MQTT_PASSWORD                     ""
 
 
 /********************* MQTT MESSAGE CONFIGURATION MACROS **********************/
 /* The MQTT topics to be used by the publisher and subscriber. */
-#define MQTT_PUB_TOPIC                    "ledstatus"
-#define MQTT_SUB_TOPIC                    "ledstatus"
+#define MQTT_PUB_TOPIC                    "$aws/rules/msg_d2c_rpt/nike84-mc/2.1/0"
+#define MQTT_SUB_TOPIC                    "iot/nike84-mc/cmd"
 
 /* Set the QoS that is associated with the MQTT publish, and subscribe messages.
  * Valid choices are 0, 1, and 2. Other values should not be used in this macro.
@@ -92,13 +92,13 @@
 /* MQTT messages which are published on the MQTT_PUB_TOPIC that controls the
  * device (user LED in this example) state in this code example.
  */
-#define MQTT_DEVICE_ON_MESSAGE            "TURN ON"
-#define MQTT_DEVICE_OFF_MESSAGE           "TURN OFF"
+#define MQTT_DEVICE_ON_MESSAGE            "{\"d\": [{\"d\": {\"version\": \"ON\"}}]}"
+#define MQTT_DEVICE_OFF_MESSAGE           "{\"d\": [{\"d\": {\"version\": \"OFF\"}}]}"
 
 
 /******************* OTHER MQTT CLIENT CONFIGURATION MACROS *******************/
 /* A unique client identifier to be used for every MQTT connection. */
-#define MQTT_CLIENT_IDENTIFIER            "psocedge-mqtt-client"
+#define MQTT_CLIENT_IDENTIFIER            "nike84-mc"
 
 /* The timeout in milliseconds for MQTT operations in this example. */
 #define MQTT_TIMEOUT_MS                   ( 5000 )
@@ -112,7 +112,7 @@
  * generate a unique client identifier by appending a timestamp to the
  * 'MQTT_CLIENT_IDENTIFIER' string. Example: 'psoc6-mqtt-client5927'
  */
-#define GENERATE_UNIQUE_CLIENT_ID         ( 1 )
+#define GENERATE_UNIQUE_CLIENT_ID         ( 0 )
 
 /* The longest client identifier that an MQTT server must accept (as defined
  * by the MQTT 3.1.1 spec) is 23 characters. However some MQTT brokers support
@@ -145,7 +145,7 @@
  * Uncomment the below line and specify the SNI Host Name to use this extension
  * as specified by the MQTT Broker.
  */
-// #define MQTT_SNI_HOSTNAME                 "SNI_HOST_NAME"
+#define MQTT_SNI_HOSTNAME                 MQTT_BROKER_ADDRESS
 
 /* A Network buffer is allocated for sending and receiving MQTT packets over
  * the network. Specify the size of this buffer using this macro.
@@ -179,10 +179,43 @@
 "-----END RSA PRIVATE KEY-----"
 
 /* PEM-encoded Root CA certificate */
+#if 0
 #define ROOT_CA_CERTIFICATE     \
 "-----BEGIN CERTIFICATE-----\n" \
-"........base64 data........\n" \
+"MIIDQTCCAimgAwIBAgITBmyfz5m/jAo54vB4ikPmljZbyjANBgkqhkiG9w0BAQsF\n" \
+"ADA5MQswCQYDVQQGEwJVUzEPMA0GA1UEChMGQW1hem9uMRkwFwYDVQQDExBBbWF6\n" \
+"b24gUm9vdCBDQSAxMB4XDTE1MDUyNjAwMDAwMFoXDTM4MDExNzAwMDAwMFowOTEL\n" \
+"MAkGA1UEBhMCVVMxDzANBgNVBAoTBkFtYXpvbjEZMBcGA1UEAxMQQW1hem9uIFJv\n" \
+"b3QgQ0EgMTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBALJ4gHHKeNXj\n" \
+"ca9HgFB0fW7Y14h29Jlo91ghYPl0hAEvrAIthtOgQ3pOsqTQNroBvo3bSMgHFzZM\n" \
+"9O6II8c+6zf1tRn4SWiw3te5djgdYZ6k/oI2peVKVuRF4fn9tBb6dNqcmzU5L/qw\n" \
+"IFAGbHrQgLKm+a/sRxmPUDgH3KKHOVj4utWp+UhnMJbulHheb4mjUcAwhmahRWa6\n" \
+"VOujw5H5SNz/0egwLX0tdHA114gk957EWW67c4cX8jJGKLhD+rcdqsq08p8kDi1L\n" \
+"93FcXmn/6pUCyziKrlA4b9v7LWIbxcceVOF34GfID5yHI9Y/QCB/IIDEgEw+OyQm\n" \
+"jgSubJrIqg0CAwEAAaNCMEAwDwYDVR0TAQH/BAUwAwEB/zAOBgNVHQ8BAf8EBAMC\n" \
+"AYYwHQYDVR0OBBYEFIQYzIU07LwMlJQuCFmcx7IQTgoIMA0GCSqGSIb3DQEBCwUA\n" \
+"A4IBAQCY8jdaQZChGsV2USggNiMOruYou6r4lK5IpDB/G/wkjUu0yKGX9rbxenDI\n" \
+"U5PMCCjjmCXPI6T53iHTfIUJrU6adTrCC2qJeHZERxhlbI1Bjjt/msv0tadQ1wUs\n" \
+"N+gDS63pYaACbvXy8MWy7Vu33PqUXHeeE6V/Uq2V8viTO96LXFvKWlJbYK8U90vv\n" \
+"o/ufQJVtMVT8QtPHRh8jrdkPSHCa2XV4cdFyQzR1bldZwgJcJmApzyMZFo6IQ6XU\n" \
+"5MsI+yMRQ+hDKXJioaldXgjUkK642M4UwtBV8ob2xJNDd2ZhwLnoQdeXeGADbkpy\n" \
+"rqXRfboQnoZsG4q5WTP468SQvvG5\n" \
 "-----END CERTIFICATE-----"
+#else
+#define ROOT_CA_CERTIFICATE     \
+"-----BEGIN CERTIFICATE-----\n"\
+"MIIBtjCCAVugAwIBAgITBmyf1XSXNmY/Owua2eiedgPySjAKBggqhkjOPQQDAjA5\n"\
+"MQswCQYDVQQGEwJVUzEPMA0GA1UEChMGQW1hem9uMRkwFwYDVQQDExBBbWF6b24g\n"\
+"Um9vdCBDQSAzMB4XDTE1MDUyNjAwMDAwMFoXDTQwMDUyNjAwMDAwMFowOTELMAkG\n"\
+"A1UEBhMCVVMxDzANBgNVBAoTBkFtYXpvbjEZMBcGA1UEAxMQQW1hem9uIFJvb3Qg\n"\
+"Q0EgMzBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABCmXp8ZBf8ANm+gBG1bG8lKl\n"\
+"ui2yEujSLtf6ycXYqm0fc4E7O5hrOXwzpcVOho6AF2hiRVd9RFgdszflZwjrZt6j\n"\
+"QjBAMA8GA1UdEwEB/wQFMAMBAf8wDgYDVR0PAQH/BAQDAgGGMB0GA1UdDgQWBBSr\n"\
+"ttvXBp43rDCGB5Fwx5zEGbF4wDAKBggqhkjOPQQDAgNJADBGAiEA4IWSoxe3jfkr\n"\
+"BqWTrBqYaGFy+uGh0PsceGCmQ5nFuMQCIQCcAu/xlJyzlvnrxir4tiz+OpAUFteM\n"\
+"YyRIHN8wfdVoOw==\n"\
+"-----END CERTIFICATE-----"
+#endif
 
 /******************************************************************************
 * Global Variables
