@@ -77,7 +77,7 @@ INCLUDES=
 # Custom configuration of mbedtls library.
 # This file will override what we picked up from wifi-core-freertos-lwip-mbedtls/configs
 # @see: proj_cm33_ns/mbedtls_user_overlay.h
-MBEDTLSFLAGS = MBEDTLS_USER_CONFIG_FILE='"mbedtls_user_overlay.h"'
+MBEDTLSFLAGS=MBEDTLS_USER_CONFIG_FILE='"mbedtls_user_overlay.h"'
 
 # Add additional defines to the build process (without a leading -D).
 DEFINES+=$(MBEDTLSFLAGS) CYBSP_WIFI_CAPABLE CY_RETARGET_IO_CONVERT_LF_TO_CRLF CY_RTOS_AWARE
@@ -85,7 +85,6 @@ DEFINES+=$(MBEDTLSFLAGS) CYBSP_WIFI_CAPABLE CY_RETARGET_IO_CONVERT_LF_TO_CRLF CY
 # Default configuration of mbedtls library.
 DEFINES+=MBEDTLS_CONFIG_FILE='"mbedtls/mbedtls_config.h"'
 # PSA configuration of mbedtls library.
-#DEFINES+=MBEDTLS_PSA_CRYPTO_CONFIG_FILE='"configs/ifx_psa_crypto_config.h"'
 DEFINES+=MBEDTLS_PSA_CRYPTO_CONFIG_FILE='"crypto_config_profile_large.h"'
 
 # Enable PSA support
