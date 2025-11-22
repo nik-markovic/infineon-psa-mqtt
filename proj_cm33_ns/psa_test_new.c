@@ -234,7 +234,7 @@ error_cleanup:
 }
 
 /* Configure security_info with PSA cert and opaque key */
-void psa_mqtt_inject_credentials(cy_awsport_ssl_credentials_t *sec_info) {
+void psa_mqtt_inject_credentials_old(cy_awsport_ssl_credentials_t *sec_info) {
 
     // TEMP: Test PSA support
     // test_psa_algorithms();

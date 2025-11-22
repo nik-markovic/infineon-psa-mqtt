@@ -286,7 +286,10 @@ int main(void)
     // psa_test();
 
     extern void psa_mqtt_setup(void);
-    psa_mqtt_setup();
+    // psa_mqtt_setup();
+
+    extern void psa_mqtt_setup_huk(void);
+    psa_mqtt_setup_huk();
 
     #if 0
     extern void psa_test_task(void *pvParameters);

@@ -66,8 +66,8 @@
 
 /********************* MQTT MESSAGE CONFIGURATION MACROS **********************/
 /* The MQTT topics to be used by the publisher and subscriber. */
-#define MQTT_PUB_TOPIC                    "$aws/rules/msg_d2c_rpt/nike84-mc/2.1/0"
-#define MQTT_SUB_TOPIC                    "iot/nike84-mc/cmd"
+#define MQTT_PUB_TOPIC                    "$aws/rules/msg_d2c_rpt/nike84-huk/2.1/0"
+#define MQTT_SUB_TOPIC                    "iot/nike84-huk/cmd"
 
 /* Set the QoS that is associated with the MQTT publish, and subscribe messages.
  * Valid choices are 0, 1, and 2. Other values should not be used in this macro.
@@ -98,7 +98,7 @@
 
 /******************* OTHER MQTT CLIENT CONFIGURATION MACROS *******************/
 /* A unique client identifier to be used for every MQTT connection. */
-#define MQTT_CLIENT_IDENTIFIER            "nike84-mc"
+#define MQTT_CLIENT_IDENTIFIER            "nike84-huk"
 
 /* The timeout in milliseconds for MQTT operations in this example. */
 #define MQTT_TIMEOUT_MS                   ( 5000 )
