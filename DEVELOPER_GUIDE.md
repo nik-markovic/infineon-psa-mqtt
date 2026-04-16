@@ -50,9 +50,9 @@ The two USB-C ports are used for different purposes:
 > if you are contributing to this project.
 
 - Download [ModusToolbox&trade; software](https://www.infineon.com/cms/en/design-support/tools/sdk/modustoolbox-software/). Install the ***ModusToolbox&trade; Setup*** software. The software may require you to log into your Infineon account. In ***ModusToolbox&trade; Setup*** software, download & install the items below:
-  - ModusToolbox&trade; Tools Package 3.6.
-  - ModusToolbox&trade; Edge Protect Security Suite 1.6.0.
-  - ModusToolbox&trade; Programming Tools 1.6.0.
+  - ModusToolbox&trade; Tools Package 3.7.
+  - ModusToolbox&trade; Edge Protect Security Suite 1.6.1.
+  - ModusToolbox&trade; Programming Tools 1.8.0.
   - Arm GCC Toolchain (GCC) 14.2.1.
   - Microsoft Visual Studio Code.
 
