@@ -35,8 +35,8 @@ The same certificate will be retrieved and printed upon subsequent reboots.
 
 ## Requirements
 
-- [ModusToolbox&trade;](https://www.infineon.com/modustoolbox) with MTB Tools v3.7 or later (tested with v3.7)
-- Board support package (BSP) minimum required version: 1.0.0
+- [ModusToolbox&trade;](https://www.infineon.com/modustoolbox) with MTB Tools v3.7 or later (latest version tested with v3.9)
+- Board support package (BSP) minimum required version: 1.2.0 (latest version tested with 1.4.0)
 - Programming language: C
 - Associated parts: All [PSOC&trade; Edge MCU](https://www.infineon.com/products/microcontroller/32-bit-psoc-arm-cortex/32-bit-psoc-edge-arm) parts
 
