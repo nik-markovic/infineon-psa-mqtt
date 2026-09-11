@@ -43,12 +43,12 @@ The two USB-C ports are used for different purposes:
 ## Installing the Required Software
 
 - Download [ModusToolbox&trade; software](https://www.infineon.com/cms/en/design-support/tools/sdk/modustoolbox-software/). Install the ***ModusToolbox&trade; Setup*** software. The software may require you to log into your Infineon account. In ***ModusToolbox&trade; Setup*** software, download & install the items below:
-  - ModusToolbox&trade; Programming Tools 1.7.0 or 1.6.0
+  - ModusToolbox&trade; Programming Tools 1.9.0
 
 ## Flashing The Firmware
 
 * Download the 
-[avnet-iotc-mtb-psoc-edge-psa-tfm-v1.2.0.zip](https://downloads.iotconnect.io/partners/infineon/demos/avnet-iotc-mtb-psoc-edge-psa-tfm-v1.2.0.zip). 
+[avnet-iotc-mtb-psoc-edge-psa-tfm-v1.4.0.zip](https://downloads.iotconnect.io/partners/infineon/demos/avnet-iotc-mtb-psoc-edge-psa-tfm-v1.4.0.zip). 
 Unzip the file to a location of your choosing.
 
 * Connect the USB cable to the **KITPROG3 USB** port on the board.
@@ -56,13 +56,14 @@ Unzip the file to a location of your choosing.
 
 > [!NOTE]
 > The Programmer application version will not match the version listed above. 
-> The programmer GUI has its own version and will likely be shown as 5.7.
+> The programmer GUI has its own version and will likely be shown as 5.9.
 
 * Click the **Open** icon in the toolbar and select the extracted *avnet-iotc-mtb-psoc-edge-psa-tfm.hex* from the zip file
 , then click the **Open** button in the dialog.
-* In the **Programmer** pulldown, Select *KitProg3 CMSIS-DAP-BULK-XXXXXXXXXX*.
-* In the **Board** pulldown, Select *KIT_PSE84_EVAL*.
+* In the **Programmer** pulldown, Select *KIT_PSOCE84_EVK-BULK-XXXXXXXXXX*.
+* If not already selected, in the **Board** pulldown, Select *KIT_PSE84_EVAL*.
 * Click the **Connect** button on the toolbar. The programmer should connect to the board.
+* Check the **External Memory** checkbox then the *Program Settings* panel.
 * Click the **Program** button on the toolbar. The programmer should flash the application.
 
 ![programmer.jpg](images/programmer.jpg)
